@@ -17,7 +17,6 @@ A modern, feature-rich Todo application built with React, Redux Toolkit, React Q
 - 🔍 **Search**: Real-time search through todo titles
 - 🏷️ **Filtering**: Filter by All, Active, or Completed todos
 - 📊 **Progress Tracking**: Visual progress indicator with motivational messages
-- ⌨️ **Keyboard Shortcuts**: Efficient navigation and actions
 - 🎨 **Animations**: Smooth transitions and micro-interactions
 - 🔄 **Optimistic Updates**: Instant UI feedback with React Query
 - 📱 **Responsive Design**: Works seamlessly on all device sizes
@@ -71,13 +70,6 @@ npm run dev
 
 - **Search**: Use the search bar to filter todos by title
 - **Filter**: Click filter buttons to show All, Active, or Completed todos
-- **Keyboard Shortcuts**: Press `?` to see available shortcuts:
-  - `a` - Show all todos
-  - `c` - Show completed todos
-  - `i` - Show incomplete todos
-  - `/` - Focus search input
-  - `Escape` - Clear search
-  - `?` - Toggle help modal
 
 ### Progress Tracking
 
@@ -89,36 +81,36 @@ npm run dev
 
 ### State Management
 
-- **Redux Toolkit**: Global state for todos, filters, and search
-- **React Query**: Server state management with automatic caching
-- **Local Component State**: UI-specific state (modals, forms)
+- **Redux Toolkit**: Global state for todos, filters, search, and UI state
+- **React Query**: Server state management with automatic caching and optimistic updates
+- **Local Component State**: UI-specific state (modals, forms, drag states)
 
 ### Data Flow
 
-1. **Fetch**: React Query fetches todos from API
-2. **Cache**: Data is cached and synchronized with Redux
-3. **Optimistic Updates**: UI updates immediately, then syncs with server
-4. **Error Handling**: Graceful error handling with toast notifications
+1. **Fetch**: React Query fetches todos from DummyJSON API
+2. **Cache**: Data is cached and synchronized with Redux store
+3. **Optimistic Updates**: UI updates immediately with Redux, then syncs with server
+4. **Error Handling**: Graceful error handling with toast notifications and fallback states
 
 ### Component Structure
 
 ```
 src/
 ├── components/
-│   ├── AddTodo.tsx          # Todo creation form
-│   ├── TodoItem.tsx         # Individual todo item
-│   ├── TodoList.tsx         # List with drag & drop
-│   ├── TodoFilters.tsx      # Search and filter controls
-│   ├── ProgressIndicator.tsx # Progress tracking
-│   └── KeyboardShortcuts.tsx # Help and shortcuts
+│   ├── NewTodoApp.tsx       # Main todo application component
+│   ├── NewAddTodo.tsx       # Todo creation form with validation
+│   ├── NewTodoItem.tsx      # Individual todo item with drag & drop
+│   ├── NewTodoFilters.tsx   # Search and filter controls
+│   ├── NewProgressIndicator.tsx # Progress tracking with animations
+│   └── PresentationalTodoItem.tsx # Reusable todo item UI component
 ├── hooks/
 │   ├── redux.ts             # Typed Redux hooks
-│   └── useTodos.ts          # React Query hooks
+│   └── useNewTodos.ts       # React Query hooks for todo operations
 ├── store/
 │   ├── index.ts             # Redux store configuration
-│   └── todoSlice.ts         # Todo slice with actions
+│   └── newTodoSlice.ts      # Todo slice with actions and state management
 ├── services/
-│   └── todoApi.ts           # API service layer
+│   └── todoApi.ts           # API service layer for DummyJSON integration
 ├── types/
 │   └── todo.ts              # TypeScript types and Zod schemas
 └── lib/
@@ -199,8 +191,8 @@ All API calls include error handling and optimistic updates for the best user ex
 🎉 **Search**: Real-time search functionality  
 🎉 **Animations**: Smooth drag-and-drop and UI animations  
 🎉 **Optimistic Updates**: Instant UI feedback with React Query  
-🎉 **Progress Tracking**: Visual progress indicator  
-🎉 **Keyboard Shortcuts**: Power user features  
+🎉 **Progress Tracking**: Visual progress indicator
+
 🎉 **Toast Notifications**: User feedback for all actions  
 🎉 **Responsive Design**: Works on all device sizes
 

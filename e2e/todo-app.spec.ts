@@ -9,8 +9,8 @@ test.describe('TodoApp E2E Tests', () => {
   });
 
   test('should load todos from API and display them', async ({ page }) => {
-    // Check for the new app heading
-    await expect(page.locator('h1')).toContainText('New Todo Master');
+    // Check for the app heading
+    await expect(page.locator('h1')).toContainText('Todo Master');
     
     // Check for TDD description
     await expect(page.locator('text=Built with TDD')).toBeVisible();

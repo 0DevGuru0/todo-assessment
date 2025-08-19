@@ -111,9 +111,7 @@ export function NewTodoApp() {
             <div className="p-3 bg-blue-600 rounded-full">
               <CheckCircleIcon className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-gray-900">
-              New Todo Master
-            </h1>
+            <h1 className="text-4xl font-bold text-gray-900">Todo Master</h1>
           </div>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Organize your tasks efficiently with drag-and-drop functionality,
