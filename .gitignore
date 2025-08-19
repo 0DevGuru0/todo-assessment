@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 test-results/
-playwright-report/
+playwright-report
