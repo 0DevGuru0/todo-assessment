@@ -27,9 +27,6 @@ test.describe('TodoApp E2E Tests', () => {
     
     // Should have loaded todos from API
     expect(todoCount).toBeGreaterThan(0);
-    
-    // Take screenshot
-    await page.screenshot({ path: 'test-results/new-todo-app-loaded.png' });
   });
 
   test('should have working drag and drop functionality', async ({ page }) => {
@@ -50,9 +47,6 @@ test.describe('TodoApp E2E Tests', () => {
     // Get their ID attributes before drag to track them
     const firstId = await firstTodo.getAttribute('data-todo-id');
     const secondId = await secondTodo.getAttribute('data-todo-id');
-    
-    // Take screenshot before drag
-    await page.screenshot({ path: 'test-results/new-todo-before-drag.png' });
     
     // Hover over first todo to make drag handle visible
     await firstTodo.hover();
@@ -84,9 +78,6 @@ test.describe('TodoApp E2E Tests', () => {
       const items = document.querySelectorAll('[data-testid="todo-item"]');
       return items.length > 0;
     }, { timeout: 3000 });
-    
-    // Take screenshot after drag
-    await page.screenshot({ path: 'test-results/new-todo-after-drag.png' });
     
     // Check if order changed by checking the IDs in new positions
     const newFirstId = await todoItems.nth(0).getAttribute('data-todo-id');
@@ -208,9 +199,6 @@ test.describe('TodoApp E2E Tests', () => {
     
     // Verify the new todo appears in the list
     await expect(page.locator('text=' + newTodoText)).toBeVisible();
-    
-    // Take screenshot
-    await page.screenshot({ path: 'test-results/new-todo-added.png' });
   });
 
   test('should remove todo item', async ({ page }) => {
@@ -254,9 +242,6 @@ test.describe('TodoApp E2E Tests', () => {
       const deletedTodoExists = await page.locator('text=' + firstTodoText.slice(0, 20)).isVisible();
       expect(deletedTodoExists).toBe(false);
     }
-    
-    // Take screenshot
-    await page.screenshot({ path: 'test-results/new-todo-removed.png' });
   });
 
   test('should handle complete CRUD cycle', async ({ page }) => {
@@ -329,9 +314,6 @@ test.describe('TodoApp E2E Tests', () => {
     // Verify todo was deleted
     const todoExists = await page.locator('text=' + uniqueTodoText).isVisible();
     expect(todoExists).toBe(false);
-    
-    // Take final screenshot
-    await page.screenshot({ path: 'test-results/new-todo-crud-complete.png' });
   });
 
   test('should maintain order after adding and removing items', async ({ page }) => {
