@@ -1,5 +1,6 @@
 import { useEffect, useCallback } from 'react';
 import { useAppSelector } from './redux';
+import type { Todo, TodoWithOrder } from '../types/todo';
 
 const STORAGE_KEY = 'todoOrder';
 
@@ -23,12 +24,19 @@ export const useTodoOrderPersistence = () => {
   }, [todos]);
 
   // Load saved order when component mounts
-  const loadSavedOrder = () => {
+  const loadSavedOrder = (): TodoOrderItem[] | null => {
     try {
       const savedOrderStr = localStorage.getItem(STORAGE_KEY);
       if (savedOrderStr) {
-        const savedOrder: TodoOrderItem[] = JSON.parse(savedOrderStr);
-        return savedOrder;
+        const parsed = JSON.parse(savedOrderStr);
+        // Validate the parsed data structure
+        if (Array.isArray(parsed) && parsed.every(item => 
+          typeof item === 'object' && 
+          typeof item.id === 'number' && 
+          typeof item.order === 'number'
+        )) {
+          return parsed as TodoOrderItem[];
+        }
       }
     } catch (error) {
       console.error('Failed to load saved todo order:', error);
@@ -37,10 +45,13 @@ export const useTodoOrderPersistence = () => {
   };
 
   // Apply saved order to todos
-  const applySavedOrder = useCallback((fetchedTodos: any[]) => {
+  const applySavedOrder = useCallback((fetchedTodos: Todo[]): TodoWithOrder[] => {
     const savedOrder = loadSavedOrder();
     if (!savedOrder) {
-      return fetchedTodos;
+      return fetchedTodos.map((todo, index) => ({
+        ...todo,
+        order: index
+      }));
     }
 
     // Create a map of id to order
@@ -54,7 +65,7 @@ export const useTodoOrderPersistence = () => {
     });
 
     // Assign correct order values
-    return sortedTodos.map((todo, index) => ({
+    return sortedTodos.map((todo, index): TodoWithOrder => ({
       ...todo,
       order: index
     }));

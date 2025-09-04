@@ -1,16 +1,12 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { arrayMove } from '@dnd-kit/sortable';
-import type { Todo } from '../types/todo';
-
-interface TodoWithOrder extends Todo {
-  order: number;
-}
+import type { Todo, TodoWithOrder, TodoFilter } from '../types/todo';
 
 interface NewTodoState {
   todos: TodoWithOrder[];
   loading: boolean;
   error: string | null;
-  filter: 'all' | 'completed' | 'incomplete';
+  filter: TodoFilter;
   searchQuery: string;
 }
 
@@ -26,10 +22,10 @@ const newTodoSlice = createSlice({
   name: 'newTodo',
   initialState,
   reducers: {
-    setTodos: (state, action: PayloadAction<Todo[]>) => {
+    setTodos: (state, action: PayloadAction<Todo[] | TodoWithOrder[]>) => {
       // Convert todos to TodoWithOrder
       // If todo already has order property, preserve it; otherwise assign based on index
-      state.todos = action.payload.map((todo, index) => ({
+      state.todos = action.payload.map((todo, index): TodoWithOrder => ({
         ...todo,
         order: ('order' in todo && typeof todo.order === 'number') ? todo.order : index,
       }));
@@ -91,7 +87,7 @@ const newTodoSlice = createSlice({
         state.todos[todoIndex].todo = action.payload.text;
       }
     },
-    setFilter: (state, action: PayloadAction<'all' | 'completed' | 'incomplete'>) => {
+    setFilter: (state, action: PayloadAction<TodoFilter>) => {
       state.filter = action.payload;
     },
     setSearchQuery: (state, action: PayloadAction<string>) => {

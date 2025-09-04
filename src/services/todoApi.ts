@@ -1,8 +1,8 @@
-import type { Todo, CreateTodoInput, UpdateTodoInput, TodosResponse } from '../types/todo';
+import type { Todo, CreateTodoInput, UpdateTodoInput, TodosResponse, ApiError } from '../types/todo';
 
 const API_BASE_URL = 'https://dummyjson.com';
 
-class TodoApiError extends Error {
+class TodoApiError extends Error implements ApiError {
   status?: number;
   
   constructor(message: string, status?: number) {
@@ -15,8 +15,10 @@ class TodoApiError extends Error {
 const handleApiError = async (response: Response): Promise<never> => {
   let errorMessage = 'An error occurred';
   try {
-    const errorData = await response.json();
-    errorMessage = errorData.message || errorMessage;
+    const errorData: unknown = await response.json();
+    if (errorData && typeof errorData === 'object' && 'message' in errorData) {
+      errorMessage = String(errorData.message) || errorMessage;
+    }
   } catch {
     errorMessage = `HTTP ${response.status}: ${response.statusText}`;
   }

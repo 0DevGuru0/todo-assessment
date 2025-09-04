@@ -3,13 +3,16 @@ import { useDispatch } from "react-redux";
 import { useAppSelector } from "../hooks/redux";
 import { setFilter, setSearchQuery } from "../store/newTodoSlice";
 import type { AppDispatch } from "../store";
+import type { TodoFilter } from "../types/todo";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 export const NewTodoFilters: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { filter, searchQuery, todos } = useAppSelector((state) => state.newTodo);
+  const { filter, searchQuery, todos } = useAppSelector(
+    (state) => state.newTodo
+  );
 
-  const handleFilterChange = (newFilter: 'all' | 'completed' | 'incomplete') => {
+  const handleFilterChange = (newFilter: TodoFilter) => {
     dispatch(setFilter(newFilter));
   };
 
@@ -28,27 +31,27 @@ export const NewTodoFilters: React.FC = () => {
   // Apply filtering and searching for display
   const getFilteredTodos = () => {
     let filtered = [...todos];
-    
+
     // Apply filter
-    if (filter === 'completed') {
-      filtered = filtered.filter(todo => todo.completed);
-    } else if (filter === 'incomplete') {
-      filtered = filtered.filter(todo => !todo.completed);
+    if (filter === "completed") {
+      filtered = filtered.filter((todo) => todo.completed);
+    } else if (filter === "incomplete") {
+      filtered = filtered.filter((todo) => !todo.completed);
     }
-    
+
     // Apply search
     if (searchQuery.trim()) {
-      filtered = filtered.filter(todo => 
+      filtered = filtered.filter((todo) =>
         todo.todo.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
+
     return filtered;
   };
 
   const filteredTodos = getFilteredTodos();
 
-  const filterButtons: { value: 'all' | 'completed' | 'incomplete'; label: string; count: number }[] = [
+  const filterButtons: { value: TodoFilter; label: string; count: number }[] = [
     { value: "all", label: "All", count: todos.length },
     { value: "incomplete", label: "Active", count: incompleteCount },
     { value: "completed", label: "Completed", count: completedCount },

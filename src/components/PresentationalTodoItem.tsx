@@ -4,17 +4,13 @@ import type { AppDispatch } from "../store";
 import { editTodo } from "../store/newTodoSlice";
 import { useTodoMutations } from "../hooks/useTodoMutations";
 import { ConfirmationModal } from "./ConfirmationModal";
-import type { Todo } from "../types/todo";
+import type { TodoWithOrder } from "../types/todo";
 import {
   TrashIcon,
   Bars3Icon,
   CheckIcon,
   PencilIcon,
 } from "@heroicons/react/24/outline";
-
-interface TodoWithOrder extends Todo {
-  order: number;
-}
 
 interface PresentationalTodoItemProps {
   todo: TodoWithOrder;

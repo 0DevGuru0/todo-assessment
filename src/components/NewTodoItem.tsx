@@ -1,11 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { Todo } from "../types/todo";
+import type { TodoWithOrder } from "../types/todo";
 import { PresentationalTodoItem } from "./PresentationalTodoItem";
-
-interface TodoWithOrder extends Todo {
-  order: number;
-}
 
 interface NewTodoItemProps {
   todo: TodoWithOrder;
