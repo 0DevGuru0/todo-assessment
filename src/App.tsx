@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import { store } from "./store";
 import { queryClient } from "./lib/queryClient";
 import { NewTodoApp } from "./components/NewTodoApp";
+import { toastConfig } from "./utils/toastHelpers";
 
 function App() {
   return (
@@ -12,27 +13,12 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <NewTodoApp />
         <Toaster
-          position="top-right"
+          position={toastConfig.position}
           toastOptions={{
-            duration: 3000,
-            style: {
-              background: "#363636",
-              color: "#fff",
-            },
-            success: {
-              duration: 3000,
-              iconTheme: {
-                primary: "#4ade80",
-                secondary: "#fff",
-              },
-            },
-            error: {
-              duration: 4000,
-              iconTheme: {
-                primary: "#ef4444",
-                secondary: "#fff",
-              },
-            },
+            ...toastConfig,
+            success: toastConfig.success,
+            error: toastConfig.error,
+            loading: toastConfig.loading,
           }}
         />
         <ReactQueryDevtools initialIsOpen={false} />

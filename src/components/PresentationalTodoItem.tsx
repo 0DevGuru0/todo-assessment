@@ -37,7 +37,11 @@ export const PresentationalTodoItem = forwardRef<
 
     const handleToggleComplete = () => {
       // Toggle the current state
-      toggleTodo({ id: todo.id, completed: !todo.completed });
+      toggleTodo({
+        id: todo.id,
+        completed: !todo.completed,
+        todoText: todo.todo,
+      });
     };
 
     const handleDeleteClick = () => {
@@ -45,7 +49,7 @@ export const PresentationalTodoItem = forwardRef<
     };
 
     const handleConfirmDelete = () => {
-      deleteTodo(todo.id);
+      deleteTodo({ id: todo.id, todoText: todo.todo });
       setShowDeleteModal(false);
     };
 
@@ -62,7 +66,11 @@ export const PresentationalTodoItem = forwardRef<
       e.preventDefault();
       if (editText.trim() && editText !== todo.todo) {
         dispatch(editTodo({ id: todo.id, text: editText.trim() }));
-        updateTodo({ id: todo.id, updates: { todo: editText.trim() } });
+        updateTodo({
+          id: todo.id,
+          updates: { todo: editText.trim() },
+          todoText: todo.todo,
+        });
       }
       setIsEditing(false);
     };

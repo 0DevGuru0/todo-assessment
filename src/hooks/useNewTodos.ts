@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { todoApi } from '../services/todoApi';
 import { useAppDispatch, useAppSelector } from './redux';
 import { setTodos, setLoading, setError } from '../store/newTodoSlice';
-import { toast } from 'react-hot-toast';
+import { todoToasts } from '../utils/toastHelpers';
 import { useTodoOrderPersistence } from './useTodoOrderPersistence';
 
 export const NEW_TODOS_QUERY_KEY = ['new-todos'];
@@ -32,7 +32,7 @@ export const useNewTodos = () => {
     if (todosQuery.error) {
       const errorMessage = todosQuery.error.message || 'Failed to fetch todos';
       dispatch(setError(errorMessage));
-      toast.error(`New TodoApp: ${errorMessage}`);
+      todoToasts.loadError(todosQuery.error);
     }
   }, [todosQuery.error, dispatch]);
 
