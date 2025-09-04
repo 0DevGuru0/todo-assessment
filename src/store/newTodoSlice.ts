@@ -27,10 +27,11 @@ const newTodoSlice = createSlice({
   initialState,
   reducers: {
     setTodos: (state, action: PayloadAction<Todo[]>) => {
-      // Convert todos to TodoWithOrder and assign order based on array index
+      // Convert todos to TodoWithOrder
+      // If todo already has order property, preserve it; otherwise assign based on index
       state.todos = action.payload.map((todo, index) => ({
         ...todo,
-        order: index,
+        order: ('order' in todo && typeof todo.order === 'number') ? todo.order : index,
       }));
       state.loading = false;
       state.error = null;
@@ -84,6 +85,12 @@ const newTodoSlice = createSlice({
         }));
       }
     },
+    editTodo: (state, action: PayloadAction<{ id: number; text: string }>) => {
+      const todoIndex = state.todos.findIndex(todo => todo.id === action.payload.id);
+      if (todoIndex !== -1) {
+        state.todos[todoIndex].todo = action.payload.text;
+      }
+    },
     setFilter: (state, action: PayloadAction<'all' | 'completed' | 'incomplete'>) => {
       state.filter = action.payload;
     },
@@ -93,5 +100,5 @@ const newTodoSlice = createSlice({
   },
 });
 
-export const { setTodos, setLoading, setError, reorderTodos, toggleTodo, addTodo, removeTodo, setFilter, setSearchQuery } = newTodoSlice.actions;
+export const { setTodos, setLoading, setError, reorderTodos, toggleTodo, addTodo, removeTodo, editTodo, setFilter, setSearchQuery } = newTodoSlice.actions;
 export default newTodoSlice.reducer;

@@ -4,12 +4,14 @@ import { todoApi } from '../services/todoApi';
 import { useAppDispatch, useAppSelector } from './redux';
 import { setTodos, setLoading, setError } from '../store/newTodoSlice';
 import { toast } from 'react-hot-toast';
+import { useTodoOrderPersistence } from './useTodoOrderPersistence';
 
 export const NEW_TODOS_QUERY_KEY = ['new-todos'];
 
 export const useNewTodos = () => {
   const dispatch = useAppDispatch();
   const { todos, loading, error } = useAppSelector((state) => state.newTodo);
+  const { applySavedOrder } = useTodoOrderPersistence();
 
   // Fetch todos query using the same API
   const todosQuery = useQuery({
@@ -20,9 +22,11 @@ export const useNewTodos = () => {
   // Handle query state changes
   React.useEffect(() => {
     if (todosQuery.data) {
-      dispatch(setTodos(todosQuery.data.todos));
+      // Apply saved order before setting todos
+      const todosWithSavedOrder = applySavedOrder(todosQuery.data.todos);
+      dispatch(setTodos(todosWithSavedOrder));
     }
-  }, [todosQuery.data, dispatch]);
+  }, [todosQuery.data, dispatch, applySavedOrder]);
 
   React.useEffect(() => {
     if (todosQuery.error) {

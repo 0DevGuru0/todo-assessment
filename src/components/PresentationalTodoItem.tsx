@@ -1,9 +1,16 @@
 import React, { forwardRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../store";
-import { toggleTodo, removeTodo } from "../store/newTodoSlice";
+import { editTodo } from "../store/newTodoSlice";
+import { useTodoMutations } from "../hooks/useTodoMutations";
+import { ConfirmationModal } from "./ConfirmationModal";
 import type { Todo } from "../types/todo";
-import { TrashIcon, Bars3Icon, CheckIcon } from "@heroicons/react/24/outline";
+import {
+  TrashIcon,
+  Bars3Icon,
+  CheckIcon,
+  PencilIcon,
+} from "@heroicons/react/24/outline";
 
 interface TodoWithOrder extends Todo {
   order: number;
@@ -14,7 +21,7 @@ interface PresentationalTodoItemProps {
   isDragging?: boolean;
   isOverlay?: boolean;
   style?: React.CSSProperties;
-  dragHandleProps?: Record<string, any>;
+  dragHandleProps?: Record<string, unknown>;
 }
 
 export const PresentationalTodoItem = forwardRef<
@@ -26,23 +33,53 @@ export const PresentationalTodoItem = forwardRef<
     ref
   ) => {
     const dispatch = useDispatch<AppDispatch>();
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const { toggleTodo, deleteTodo, updateTodo, isDeleting, isUpdating } =
+      useTodoMutations();
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editText, setEditText] = useState(todo.todo);
 
     const handleToggleComplete = () => {
-      dispatch(toggleTodo(todo.id));
+      // Toggle the current state
+      toggleTodo({ id: todo.id, completed: !todo.completed });
     };
 
     const handleDeleteClick = () => {
-      setShowDeleteConfirm(true);
+      setShowDeleteModal(true);
     };
 
     const handleConfirmDelete = () => {
-      dispatch(removeTodo(todo.id));
-      setShowDeleteConfirm(false);
+      deleteTodo(todo.id);
+      setShowDeleteModal(false);
     };
 
     const handleCancelDelete = () => {
-      setShowDeleteConfirm(false);
+      setShowDeleteModal(false);
+    };
+
+    const handleEditClick = () => {
+      setIsEditing(true);
+      setEditText(todo.todo);
+    };
+
+    const handleEditSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (editText.trim() && editText !== todo.todo) {
+        dispatch(editTodo({ id: todo.id, text: editText.trim() }));
+        updateTodo({ id: todo.id, updates: { todo: editText.trim() } });
+      }
+      setIsEditing(false);
+    };
+
+    const handleEditCancel = () => {
+      setIsEditing(false);
+      setEditText(todo.todo);
+    };
+
+    const handleEditKeyDown = (e: React.KeyboardEvent) => {
+      if (e.key === "Escape") {
+        handleEditCancel();
+      }
     };
 
     return (
@@ -84,21 +121,53 @@ export const PresentationalTodoItem = forwardRef<
             {todo.completed && <CheckIcon className="w-4 h-4" />}
           </button>
 
-          {/* Todo Text */}
+          {/* Todo Text or Edit Input */}
           <div className="flex-1 min-w-0">
-            <p
-              onClick={handleToggleComplete}
-              className={`
-              text-sm cursor-pointer transition-all duration-200
-              ${
-                todo.completed
-                  ? "line-through text-gray-500"
-                  : "text-gray-900 hover:text-gray-700"
-              }
-            `}
-            >
-              {todo.todo}
-            </p>
+            {isEditing ? (
+              <form
+                onSubmit={handleEditSubmit}
+                className="flex items-center space-x-2"
+              >
+                <input
+                  type="text"
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  onKeyDown={handleEditKeyDown}
+                  className="flex-1 px-2 py-1 text-sm border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  autoFocus
+                  disabled={isUpdating}
+                />
+                <button
+                  type="submit"
+                  disabled={!editText.trim() || isUpdating}
+                  className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={handleEditCancel}
+                  disabled={isUpdating}
+                  className="px-2 py-1 text-xs bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </form>
+            ) : (
+              <p
+                onClick={handleToggleComplete}
+                className={`
+                text-sm cursor-pointer transition-all duration-200
+                ${
+                  todo.completed
+                    ? "line-through text-gray-500"
+                    : "text-gray-900 hover:text-gray-700"
+                }
+              `}
+              >
+                {todo.todo}
+              </p>
+            )}
 
             {/* Metadata */}
             <div className="flex items-center space-x-2 mt-1">
@@ -116,34 +185,42 @@ export const PresentationalTodoItem = forwardRef<
             </div>
           </div>
 
-          {/* Delete Button */}
-          <div className="flex-shrink-0">
-            {showDeleteConfirm ? (
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={handleConfirmDelete}
-                  className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                >
-                  Yes
-                </button>
-                <button
-                  onClick={handleCancelDelete}
-                  className="px-2 py-1 text-xs bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
-                >
-                  No
-                </button>
-              </div>
-            ) : (
+          {/* Action Buttons */}
+          <div className="flex-shrink-0 flex items-center space-x-2">
+            {/* Edit Button */}
+            {!isEditing && (
               <button
-                onClick={handleDeleteClick}
-                className="opacity-0 group-hover:opacity-100 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-all duration-200"
-                title="Delete todo"
+                onClick={handleEditClick}
+                className="opacity-0 group-hover:opacity-100 p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded transition-all duration-200"
+                title="Edit todo"
               >
-                <TrashIcon className="w-4 h-4" />
+                <PencilIcon className="w-4 h-4" />
               </button>
             )}
+
+            {/* Delete Button */}
+            <button
+              onClick={handleDeleteClick}
+              className="opacity-0 group-hover:opacity-100 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-all duration-200"
+              title="Delete todo"
+              disabled={isDeleting || isEditing}
+            >
+              <TrashIcon className="w-4 h-4" />
+            </button>
           </div>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={showDeleteModal}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          title="Delete Todo"
+          message={`Are you sure you want to delete "${todo.todo}"? This action cannot be undone.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          isLoading={isDeleting}
+        />
       </div>
     );
   }
